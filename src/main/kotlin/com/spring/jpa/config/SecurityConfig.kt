@@ -4,15 +4,11 @@ import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer
-import jakarta.annotation.PostConstruct
-import jakarta.annotation.PreDestroy
 import org.springframework.boot.autoconfigure.jackson.Jackson2ObjectMapperBuilderCustomizer
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
-import org.springframework.security.config.annotation.web.builders.WebSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
-import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 import java.time.format.DateTimeFormatter
@@ -24,9 +20,8 @@ class SecurityConfig {
 
     companion object{
         const val URL_LOGIN = "/login"
-        const val URL_AJAX_LOGIN = "/ajax/login"
-        const val URL_AJAX_LOGOUT = "/ajax/logout"
-        const val URL_AJAX_AUTH = "/ajax/auth"
+        const val URL_API_LOGIN = "/ajax/login"
+        const val URL_API_LOGOUT = "/ajax/logout"
         const val URL_LOGOUT = "/logout"
         const val URL_HOME = "/home"
     }
@@ -35,8 +30,8 @@ class SecurityConfig {
     fun filterChain( http: HttpSecurity): SecurityFilterChain {
         http
             .authorizeHttpRequests()
-            .requestMatchers( URL_AJAX_LOGIN ).permitAll()
-            .requestMatchers( URL_AJAX_LOGOUT ).permitAll()
+            .requestMatchers( URL_API_LOGIN ).permitAll()
+            .requestMatchers( URL_API_LOGOUT ).permitAll()
             .requestMatchers("/img/**", "/h2-console/**", "/icons/**").permitAll()
             .anyRequest().authenticated()
             .and()
@@ -58,12 +53,10 @@ class ServerAppConfig : WebMvcConfigurer {
         var logger: Logger = Logger.getLogger( "ServerAppConfig" )
     }
 
-    @PostConstruct
     fun onInit() {
         logger.info("Starting App ...")
     }
 
-    @PreDestroy
     fun onDestroy() {
         logger.info("shutdown..")
     }

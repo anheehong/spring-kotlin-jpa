@@ -5,7 +5,7 @@ import org.hibernate.annotations.UpdateTimestamp
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
 import java.time.LocalDateTime
-import javax.persistence.*
+import jakarta.persistence.*
 
 @Entity
 @Table(name = "TB_USER")
@@ -19,7 +19,7 @@ class User: UserDetails {
     var displayName: String = ""
 
     @Column(length = 120, name = "user_password", nullable = false)
-    private lateinit var _password:String
+    lateinit var _password:String
 
     @CreationTimestamp
     @Column(updatable = false, nullable = false)
@@ -55,4 +55,6 @@ class User: UserDetails {
     override fun isEnabled(): Boolean {
         TODO("Not yet implemented")
     }
+
 }
+
