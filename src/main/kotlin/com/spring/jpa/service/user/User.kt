@@ -1,11 +1,13 @@
 package com.spring.jpa.service.user
 
+import jakarta.persistence.*
 import org.hibernate.annotations.CreationTimestamp
 import org.hibernate.annotations.UpdateTimestamp
 import org.springframework.security.core.GrantedAuthority
+import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
 import java.time.LocalDateTime
-import jakarta.persistence.*
+
 
 @Entity
 @Table(name = "TB_USER")
@@ -15,7 +17,7 @@ class User: UserDetails {
     @Column(length = 50, name = "user_name")
     private lateinit var _username:String
 
-    @Column(length = 120, nullable = false)
+    @Column(length = 120, name = "display_name", nullable = false)
     var displayName: String = ""
 
     @Column(length = 120, name = "user_password", nullable = false)
@@ -29,31 +31,35 @@ class User: UserDetails {
     val dtUpdate: LocalDateTime? = null
 
     override fun getAuthorities(): MutableCollection<out GrantedAuthority> {
-        TODO("Not yet implemented")
+        val authority = SimpleGrantedAuthority("SUPER")
+        val authorities: MutableCollection<GrantedAuthority> = ArrayList()
+        authorities.add(authority)
+
+        return authorities
     }
 
     override fun getPassword(): String {
-        TODO("Not yet implemented")
+        return _password
     }
 
     override fun getUsername(): String {
-        TODO("Not yet implemented")
+        return _username
     }
 
     override fun isAccountNonExpired(): Boolean {
-        TODO("Not yet implemented")
+        return true
     }
 
     override fun isAccountNonLocked(): Boolean {
-        TODO("Not yet implemented")
+        return true
     }
 
     override fun isCredentialsNonExpired(): Boolean {
-        TODO("Not yet implemented")
+        return true
     }
 
     override fun isEnabled(): Boolean {
-        TODO("Not yet implemented")
+        return true
     }
 
 }

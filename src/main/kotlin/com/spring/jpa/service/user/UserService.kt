@@ -16,7 +16,6 @@ class UserService (
 
     fun findById( id: String ) = userRepository.findById( id ).orElseThrow { Exception( "not exist") }
 
-
     private val UserRequestDto.entity get() = User().updateBy( this )
     private fun User.updateBy( request : UserRequestDto ) = this.apply{
         _password = passwordEncoder.encode(request.password)
