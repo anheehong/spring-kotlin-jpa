@@ -8,11 +8,14 @@ import org.springframework.boot.autoconfigure.jackson.Jackson2ObjectMapperBuilde
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
+import org.springframework.security.config.annotation.web.builders.WebSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 import java.time.format.DateTimeFormatter
 import java.util.logging.Logger
+
 
 @Configuration
 @EnableWebSecurity
@@ -20,10 +23,13 @@ class SecurityConfig {
 
     companion object{
         const val URL_LOGIN = "/login"
-        const val URL_API_LOGIN = "/ajax/login"
-        const val URL_API_LOGOUT = "/ajax/logout"
+        const val URL_API_LOGIN = "/auth/login"
+        const val URL_API_LOGOUT = "/auth/logout"
         const val URL_LOGOUT = "/logout"
-        const val URL_HOME = "/home"
+        const val URL_HOME = "/"
+
+        const val LOGIN_ID = "username"
+        const val LOGIN_PWD = "password"
     }
     
     @Bean
@@ -32,12 +38,28 @@ class SecurityConfig {
             .authorizeHttpRequests()
             .requestMatchers( URL_API_LOGIN ).permitAll()
             .requestMatchers( URL_API_LOGOUT ).permitAll()
-            .requestMatchers("/img/**", "/h2-console/**", "/icons/**").permitAll()
-            .anyRequest().authenticated()
-            .and()
-            .csrf().disable()
+            .requestMatchers( "h2-console/**" ).permitAll()
+            .anyRequest()
+            .authenticated()
+
+        http.cors().and().csrf().disable()
+
+        http.headers().frameOptions().sameOrigin()
+
+        http.formLogin()
+            .defaultSuccessUrl( URL_HOME )
+            .usernameParameter( LOGIN_ID )			// 아이디 파라미터명 설정
+            .passwordParameter( LOGIN_PWD )
+            .loginProcessingUrl( URL_API_LOGIN )			// 로그인 Form Action Url
 
         return http.build()
+    }
+
+    @Bean
+    fun webSecurityCustomizer(): WebSecurityCustomizer? {
+        return WebSecurityCustomizer { web: WebSecurity ->
+            web.ignoring().requestMatchers( "/h2-console/**", "/img/**" )
+        }
     }
 
 }
