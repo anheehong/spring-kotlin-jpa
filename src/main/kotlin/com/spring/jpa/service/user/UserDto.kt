@@ -6,12 +6,10 @@ class UserDto{
 }
 
 
-class UserRequestDto(
-    var userName: String,
-    var displayName: String,
+data class UserRequestDto(
+    var username: String,
     var password: String
 ) {
-
 
 }
 

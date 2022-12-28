@@ -1,0 +1,47 @@
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<!--suppress JSUnresolvedLibraryURL -->
+<head>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+    <title>Error Page</title>
+</head>
+<body>
+<div class="container">
+    <div class="col-auto">
+        <div class="panel panel-default mt-5">
+            <div class="panel-heading bg-danger">
+                <h2>
+                <!--/*@thymesVar id="status" type="String"*/-->
+                <!--/*@thymesVar id="error" type="String"*/-->
+                <span th:text="${status}">404</span> <span th:text="${error}">Error</span>
+                </h2>
+            </div>
+            <div class="panel-body">
+                <div class="text-center">
+                    <img alt="error" class="rounded mb-5 mx-auto d-block" th:src="@{/asset/image/error.gif}" src="/asset/image/error.gif" style="width:50%"/>
+                    <div>
+                        <!--/*@thymesVar id="status" type="String"*/-->
+                        Status - <span th:text="${status}">HTTP Status</span><br/>
+                        <!--/*@thymesVar id="error" type="String"*/-->
+                        Error - <span th:text="${error}">오류 발생 이유</span><br/>
+                        Exception - <span th:text="${exception}">server.error.include-exception=true</span><br/>
+                        <!--/*@thymesVar id="message" type="String"*/-->
+                        Message - <span th:text="${message}">server.error.include-message=true</span><br/>
+                        <!--/*@thymesVar id="timestamp" type="java.time.LocalDateTime"*/-->
+                        Time - <span th:text="${timestamp}">시각</span><br/>
+                        <!--/*@thymesVar id="path" type="String"*/-->
+                        Path - <span th:text="${path}">경로</span><br/>
+                        <!--/*@thymesVar id="errors" type="String"*/-->
+                        Errors - <span th:text="${errors}">server.error.include-binding-errors=true</span><br/>
+                        <!--/*@thymesVar id="trace" type="String"*/-->
+                        Trace - <span th:text="${trace}">server.error.include-stacktrace=true</span><br/>
+                    </div>
+                </div>
+                <div class="text-center">
+                    <a href="/"><button type="button" class="btn btn-primary" style="margin-top: 20px; width: 100px;"><span th:text="#{error.home}">홈으로</span></button></a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

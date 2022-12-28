@@ -17,4 +17,13 @@ class UserServiceTest(
         print( encodePwd )
     }
 
+    @Test
+    fun passwordMatchesTest(){
+
+        val originPassword = "test"
+        val encodePwd = passwordEncoder.encode( originPassword )
+        println( encodePwd )
+        println( passwordEncoder.matches( originPassword, encodePwd ) )
+    }
+
 }
