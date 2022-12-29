@@ -13,5 +13,6 @@ class PropertyConfig {
 @ConfigurationProperties(prefix = "jwt.conf", ignoreUnknownFields = false, ignoreInvalidFields = false)
 class JwtConf() {
     var secretKey: String = ""
-    var expiredTime: Int = 0
+    var atExpiredTime: Int = 0
+    var rtExpiredTime: Int = 0
 }

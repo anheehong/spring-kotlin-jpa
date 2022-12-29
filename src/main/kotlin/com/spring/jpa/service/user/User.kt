@@ -15,13 +15,16 @@ class User: UserDetails {
 
     @Id
     @Column(length = 50, name = "user_name")
-    private lateinit var _username:String
+    lateinit var _username: String
+
+    @Column(length = 120, name = "user_password", nullable = false)
+    lateinit var _password: String
 
     @Column(length = 120, name = "display_name", nullable = false)
     var displayName: String = ""
 
-    @Column(length = 120, name = "user_password", nullable = false)
-    lateinit var _password:String
+    @Column(length = 1000, name = "token")
+    var token: String = ""
 
     @CreationTimestamp
     @Column(updatable = false, nullable = false)
@@ -29,6 +32,7 @@ class User: UserDetails {
 
     @UpdateTimestamp
     val dtUpdate: LocalDateTime? = null
+
 
     override fun getAuthorities(): MutableCollection<out GrantedAuthority> {
         val authority = SimpleGrantedAuthority("SUPER")

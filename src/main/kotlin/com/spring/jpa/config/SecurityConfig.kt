@@ -5,6 +5,7 @@ import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer
 import com.spring.jpa.authentication.CustomAuthenticationFilter
+import com.spring.jpa.authentication.JwtFilter
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -28,7 +29,8 @@ import java.time.format.DateTimeFormatter
 @Configuration
 @EnableWebSecurity
 class SecurityConfig(
-    @Autowired val customAuthenticationFilter : CustomAuthenticationFilter
+    @Autowired val customAuthenticationFilter: CustomAuthenticationFilter,
+    @Autowired val jwtFilter: JwtFilter,
 ) {
 
     companion object{
@@ -49,7 +51,8 @@ class SecurityConfig(
         // 토큰 기반 인증이므로 세션 사용 안함
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             .and()
-            .addFilterBefore( customAuthenticationFilter, UsernamePasswordAuthenticationFilter::class.java)
+            .addFilter( customAuthenticationFilter)
+            .addFilterBefore( jwtFilter, UsernamePasswordAuthenticationFilter::class.java)
             .exceptionHandling()
             .defaultAuthenticationEntryPointFor(
                 HttpStatusEntryPoint( HttpStatus.UNAUTHORIZED ),
@@ -67,7 +70,6 @@ class SecurityConfig(
 
         http.formLogin()
             .loginProcessingUrl( URL_API_LOGIN )
-            .defaultSuccessUrl( URL_HOME )
             .and()
             .logout()
             .logoutSuccessUrl( URL_LOGIN )

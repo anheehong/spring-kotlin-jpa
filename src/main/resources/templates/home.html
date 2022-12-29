@@ -3,19 +3,10 @@
 lang="ko">
 
 <head>
-    <title th:text="#{common.app.name}">Home Page</title>
+    <title >Home Page</title>
 </head>
-<!--/*@thymesVar id="#authentication" type="UserDetails"*/-->
-<!--/*@thymesVar id="principal" type="io.codespoon.kotlin.bigspoon.bigspoonwebalone.service.user.User"*/-->
-<body th:with="user=${#authentication.principal}">
-hello, home
-<div sec:authorize="!isAuthenticated()" class="navbar-brand" sec:authentication="name">비로그인</div>
-<div sec:authorize="isAuthenticated()" class="navbar-brand" >로그인됨</div>
-<div sec:authorize="hasAuthority('READ')">
-    이 사용자는 READ 권한이 있습니다.
-</div>
-<div sec:authorize="hasAuthority('WRITE')">
-    이 사용자는 WRITE 권한이 있습니다.
-</div>
+
+<body >
+    <div> HOME </div>
 
 </body>

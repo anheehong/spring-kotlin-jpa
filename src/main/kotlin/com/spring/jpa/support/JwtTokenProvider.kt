@@ -1,15 +1,19 @@
 package com.spring.jpa.support
 
 import com.spring.jpa.config.JwtConf
+import com.spring.jpa.service.user.UserService
 import io.jsonwebtoken.*
 import jakarta.servlet.http.HttpServletRequest
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.http.HttpHeaders
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.userdetails.UserDetailsService
+import org.springframework.security.core.userdetails.UsernameNotFoundException
 import org.springframework.stereotype.Component
+import org.springframework.transaction.annotation.Transactional
 import java.time.Instant
 import java.time.temporal.ChronoUnit
 import java.util.*
@@ -17,7 +21,8 @@ import java.util.*
 @Component
 class JwtTokenProvider(
     @Autowired val jwtConf: JwtConf,
-    private val userDetailsService: UserDetailsService
+    @Autowired private val userDetailsService: UserDetailsService,
+    @Autowired private val userService: UserService
 ) {
 
     companion object{
@@ -25,37 +30,31 @@ class JwtTokenProvider(
         val SIGNATURE_ALG: SignatureAlgorithm = SignatureAlgorithm.HS256
     }
 
-    fun createToken( username: String ): String{
-        val claims: Claims = Jwts.claims().setSubject( username )
-        claims["username"] = username
-
-        val issuedAt: Instant = Instant.now().truncatedTo(ChronoUnit.SECONDS)
-        val expiration: Instant = issuedAt.plus( jwtConf.expiredTime.toLong(), ChronoUnit.DAYS)
-
-        return Jwts.builder()
-            .setClaims(claims)
-            .setIssuedAt(Date.from(issuedAt))
-            .setExpiration(Date.from(expiration))
-            .signWith( SIGNATURE_ALG , jwtConf.secretKey)
-            .compact()
-    }
-
     // 토큰검증
     fun validateToken(token: String): Boolean {
         try {
             getAllClaims( token )
             return true
-        } catch (ex: SignatureException) {
-            logger.error("Invalid JWT signature")
-        } catch (ex: MalformedJwtException) {
-            logger.error("Invalid JWT token")
-        } catch (ex: ExpiredJwtException) {
-            logger.error("Expired JWT token")
-        } catch (ex: UnsupportedJwtException) {
-            logger.error("Unsupported JWT token")
-        } catch (ex: IllegalArgumentException) {
-            logger.error("JWT claims string is empty.")
+        } catch ( exception: Exception) {
+            when (exception) {
+                is SignatureException -> {
+                    logger.error("Invalid JWT signature")
+                }
+                is MalformedJwtException -> {
+                    logger.error("Invalid JWT token")
+                }
+                is ExpiredJwtException -> {
+                    logger.error("Expired JWT token")
+                }
+                is UnsupportedJwtException -> {
+                    logger.error("Unsupported JWT token")
+                }
+                is IllegalArgumentException -> {
+                    logger.error("JWT claims string is empty.")
+                }
+            }
         }
+
         return false
     }
 
@@ -81,7 +80,56 @@ class JwtTokenProvider(
 
     // Request의 Header에서 token 값을 가져옵니다. "X-AUTH-TOKEN" : "TOKEN값'
     fun resolveToken(request: HttpServletRequest): String? {
-        return request.getHeader("Authorization")
+        return request.getHeader(HttpHeaders.AUTHORIZATION )
+    }
+
+    fun createTokenSet( username: String ): Pair<String, String>{
+       return Pair( createAccessToken( username ), issueRefreshToken( username ) )
+    }
+
+    fun createAccessToken( username: String ): String{
+        return createToken( username, jwtConf.atExpiredTime)
+    }
+    fun createRefreshToken( username: String ): String{
+        return createToken( username, jwtConf.rtExpiredTime)
+    }
+    private fun createToken( username: String, expiredTime: Int): String{
+
+        val claims: Claims = Jwts.claims().setSubject( username )
+        claims["username"] = username
+
+        val issuedAt: Instant = Instant.now().truncatedTo(ChronoUnit.SECONDS)
+        val expiration: Instant = issuedAt.plus( expiredTime.toLong(), ChronoUnit.DAYS)
+
+        return Jwts.builder()
+            .setClaims(claims)
+            .setIssuedAt(Date.from(issuedAt))
+            .setExpiration(Date.from(expiration))
+            .signWith( SIGNATURE_ALG , jwtConf.secretKey)
+            .compact()
+    }
+
+    @Transactional
+    fun reissueRefreshToken( refreshToken: String): String?{
+        val authentication = getAuthentication(refreshToken)
+        val findRefreshToken = userService.findById(authentication.name)
+            .orElseThrow { UsernameNotFoundException("userId : " + authentication.name + " was not found") }
+
+        return if ( findRefreshToken.token == refreshToken ) {
+            val newRefreshToken: String = createRefreshToken( authentication.name )
+            userService.updateByToken( authentication.name, newRefreshToken )
+            newRefreshToken
+        } else {
+            logger.info("refresh 토큰이 일치하지 않습니다. ")
+            null
+        }
+    }
+
+    @Transactional
+    fun issueRefreshToken( username: String ): String {
+        val newRefreshToken: String = createRefreshToken( username )
+        userService.updateByToken( username, newRefreshToken )
+        return newRefreshToken
     }
 
 }
