@@ -11,22 +11,39 @@ class JwtTokenProviderTest(
     ) : BaseTest() {
 
     @Test
-    fun createToken(){
-        val token = jwtTokenProvider.createToken( "test" )
+    fun createAccessToken(){
+        val token = jwtTokenProvider.createAccessToken( "test" )
+        print( token )
+    }
+
+    @Test
+    fun createRefreshToken(){
+        val token = jwtTokenProvider.createRefreshToken( "test" )
         print( token )
     }
 
     @Test
     fun validation(){
-        val token = jwtTokenProvider.createToken( "test" )
+        val token = jwtTokenProvider.createAccessToken( "test" )
         print( jwtTokenProvider.validateToken( token ) )
     }
 
     @Test
     fun getUsername(){
-        val token = jwtTokenProvider.createToken( "test" )
+        val token = jwtTokenProvider.createAccessToken( "test" )
         print( jwtTokenProvider.getUsername( token ) )
     }
 
+    @Test
+    fun getAuthentication(){
+        val token = jwtTokenProvider.createAccessToken( "test" )
+        print( jwtTokenProvider.getAuthentication( token ) )
+    }
+
+    @Test
+    fun createTokenSet(){
+        val token = jwtTokenProvider.createTokenSet( "test" )
+        print( token )
+    }
 
 }

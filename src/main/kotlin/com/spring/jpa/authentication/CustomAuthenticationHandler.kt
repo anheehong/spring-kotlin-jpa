@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.MediaType.APPLICATION_JSON_VALUE
 import org.springframework.security.authentication.BadCredentialsException
 import org.springframework.security.authentication.DisabledException
@@ -19,8 +20,7 @@ import org.springframework.stereotype.Component
 
 @Component
 class CustomAuthenticationSuccessHandler(
-    private val jwtTokenProvider: JwtTokenProvider,
-    private val response: HttpServletResponse,
+    @Autowired private val jwtTokenProvider: JwtTokenProvider
 ) : AuthenticationSuccessHandler {
     override fun onAuthenticationSuccess(
         request: HttpServletRequest,

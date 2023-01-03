@@ -3,6 +3,7 @@ package com.spring.jpa.service.user
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.querydsl.QuerydslPredicateExecutor
+import org.springframework.security.core.userdetails.UsernameNotFoundException
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -14,7 +15,9 @@ class UserService (
     @Autowired val passwordEncoder: PasswordEncoder
 ){
 
-    fun findById( id: String ) = userRepository.findById( id )
+    fun findById( id: String ): User = userRepository.findById( id ).orElseThrow {
+        UsernameNotFoundException( "userId : $id was not found" )
+    }
 
     fun create( request: UserRequestDto )= with( userRepository ) {
         saveAndFlush(User().updateBy(request)).dto

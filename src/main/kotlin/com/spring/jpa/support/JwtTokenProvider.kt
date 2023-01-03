@@ -10,8 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpHeaders
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.Authentication
-import org.springframework.security.core.userdetails.UserDetailsService
-import org.springframework.security.core.userdetails.UsernameNotFoundException
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
 import java.time.Instant
@@ -21,7 +19,7 @@ import java.util.*
 @Component
 class JwtTokenProvider(
     @Autowired val jwtConf: JwtConf,
-    @Autowired private val userDetailsService: UserDetailsService,
+    @Autowired private val userDetailsService: LoginUserDetailsService,
     @Autowired private val userService: UserService
 ) {
 
@@ -113,7 +111,6 @@ class JwtTokenProvider(
     fun reissueRefreshToken( refreshToken: String): String?{
         val authentication = getAuthentication(refreshToken)
         val findRefreshToken = userService.findById(authentication.name)
-            .orElseThrow { UsernameNotFoundException("userId : " + authentication.name + " was not found") }
 
         return if ( findRefreshToken.token == refreshToken ) {
             val newRefreshToken: String = createRefreshToken( authentication.name )
