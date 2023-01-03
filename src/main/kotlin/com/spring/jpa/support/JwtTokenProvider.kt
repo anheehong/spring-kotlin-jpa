@@ -110,7 +110,7 @@ class JwtTokenProvider(
     @Transactional
     fun reissueRefreshToken( refreshToken: String): String?{
         val authentication = getAuthentication(refreshToken)
-        val findRefreshToken = userService.findById(authentication.name)
+        val findRefreshToken = userService.findByIdOrElseThrow(authentication.name)
 
         return if ( findRefreshToken.token == refreshToken ) {
             val newRefreshToken: String = createRefreshToken( authentication.name )

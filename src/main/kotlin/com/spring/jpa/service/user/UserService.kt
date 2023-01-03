@@ -15,7 +15,7 @@ class UserService (
     @Autowired val passwordEncoder: PasswordEncoder
 ){
 
-    fun findById( id: String ): User = userRepository.findById( id ).orElseThrow {
+    fun findByIdOrElseThrow(id: String ): User = userRepository.findById( id ).orElseThrow {
         UsernameNotFoundException( "userId : $id was not found" )
     }
 
@@ -23,13 +23,13 @@ class UserService (
         saveAndFlush(User().updateBy(request)).dto
     }
     fun update( id: String, request: UserRequestDto ) = with( userRepository ){
-        findById( id ).get().updateByMe( request ).let {
+        findByIdOrElseThrow( id ).updateByMe( request ).let {
             saveAndFlush( it )
         }.dto
     }
 
     fun updateByToken( id: String, token: String ) = with( userRepository ){
-        findById( id ).get().apply {
+        findByIdOrElseThrow( id ).apply {
             this.token = token
         }.let {
             saveAndFlush( it )
