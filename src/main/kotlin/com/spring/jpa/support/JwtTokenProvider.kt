@@ -82,14 +82,17 @@ class JwtTokenProvider(
     }
 
     fun createTokenSet( username: String ): Pair<String, String>{
-       return Pair( createAccessToken( username ), issueRefreshToken( username ) )
+       return Pair( createAccessToken( username ), createRefreshToken( username ) )
     }
 
     fun createAccessToken( username: String ): String{
         return createToken( username, jwtConf.atExpiredTime)
     }
+    @Transactional
     fun createRefreshToken( username: String ): String{
-        return createToken( username, jwtConf.rtExpiredTime)
+        val token = createToken( username, jwtConf.rtExpiredTime)
+        userService.updateByToken( username, token )
+        return token
     }
     private fun createToken( username: String, expiredTime: Int): String{
 
@@ -120,13 +123,6 @@ class JwtTokenProvider(
             logger.info("refresh 토큰이 일치하지 않습니다. ")
             null
         }
-    }
-
-    @Transactional
-    fun issueRefreshToken( username: String ): String {
-        val newRefreshToken: String = createRefreshToken( username )
-        userService.updateByToken( username, newRefreshToken )
-        return newRefreshToken
     }
 
 }
