@@ -5,6 +5,8 @@ import com.spring.jpa.test.BaseTest
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.data.domain.Pageable
+import org.springframework.data.jpa.support.PageableUtils
 import org.springframework.security.core.userdetails.UsernameNotFoundException
 import org.springframework.security.crypto.password.PasswordEncoder
 
@@ -30,7 +32,10 @@ class UserServiceTest(
 
     @Test
     fun create(){
-        val request = UserRequestDto( "name", "password", "displayName")
+        val request = UserRequestDto( "name", "password" ).apply {
+            displayName = "displayName"
+        }
+
         val createUser = userService.create( request )
         assertEquals( "name", createUser.username )
 
@@ -40,7 +45,10 @@ class UserServiceTest(
 
     @Test
     fun update(){
-        var request = UserRequestDto( "name", "password", "displayName")
+        var request = UserRequestDto( "name", "password" ).apply {
+            displayName = "displayName"
+        }
+
         val createUser = userService.create( request )
         assertEquals( "name", createUser.username )
 
@@ -68,5 +76,16 @@ class UserServiceTest(
         val token = jwtTokenProvider.createAccessToken( "admin" )
         val updateUser = userService.updateByToken( "admin", token )
         assertNotNull(updateUser.token)
+    }
+
+
+    @Test
+    fun list(){
+
+        val pageable = Pageable.ofSize( 10 )
+        val search = null
+
+        val list = userService.list( search, pageable )
+        list.forEach{ l -> println( "${l.username} ${l.displayName} ${l.token}") }
     }
 }

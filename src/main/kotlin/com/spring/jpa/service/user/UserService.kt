@@ -1,6 +1,9 @@
 package com.spring.jpa.service.user
 
+import com.querydsl.core.BooleanBuilder
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.querydsl.QuerydslPredicateExecutor
 import org.springframework.security.core.userdetails.UsernameNotFoundException
@@ -36,7 +39,12 @@ class UserService (
         }.dto
     }
 
-    private val UserRequestDto.entity get() = User().updateBy( this )
+    fun list( search: String?, pageable: Pageable ): Page<UserDto> {
+        var expression = BooleanBuilder()
+        if( search != null ) expression.and( QUser.user.displayName.like( search ) )
+        return userRepository.findAll( expression, pageable ).map { it.dto }
+    }
+
     private fun User.updateBy( request : UserRequestDto ) = this.apply{
         _username = request.username
         if( request.password != "" ){

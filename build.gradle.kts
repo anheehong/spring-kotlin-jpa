@@ -29,8 +29,6 @@ java {
 
 allOpen {
     annotation("jakarta.persistence.Entity")
-    annotation("jakarta.persistence.MappedSuperclass")
-    annotation("jakarta.persistence.Embeddable")
 }
 
 repositories {
@@ -41,7 +39,11 @@ dependencies {
     api(kotlin("reflect"))
     api(kotlin("stdlib-jdk8"))
 
-    kapt("com.querydsl:querydsl-apt:5.0.0:jakarta")     //spring-boot 3.0 javax -> jakarta 로 변경
+    //spring-boot 3.0 javax -> jakarta 로 변경
+    kapt("com.querydsl:querydsl-apt:5.0.0:jakarta")
+    implementation("com.querydsl:querydsl-jpa:5.0.0:jakarta")
+    //
+
     kapt("jakarta.persistence:jakarta.persistence-api")
     kapt("jakarta.annotation:jakarta.annotation-api")
     kapt("org.springframework.boot:spring-boot-configuration-processor")
@@ -55,7 +57,6 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("org.flywaydb:flyway-core")
-    implementation("com.querydsl:querydsl-jpa")
     implementation("org.slf4j:slf4j-api")
 
     implementation("io.jsonwebtoken:jjwt:0.9.1")
@@ -63,6 +64,8 @@ dependencies {
 
     developmentOnly("org.springframework.boot:spring-boot-devtools")
     runtimeOnly("com.h2database:h2")
+
+    testImplementation("org.springframework.restdocs:spring-restdocs-mockmvc")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.springframework.security:spring-security-test")
     testImplementation(kotlin("test-junit5"))

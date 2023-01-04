@@ -18,8 +18,8 @@ val User.dto get() = UserDto( this )
 data class UserRequestDto(
     var username: String,
     var password: String,
-    var displayName: String,
 ) {
+    var displayName: String = ""
     var token: String = ""
 }
 
