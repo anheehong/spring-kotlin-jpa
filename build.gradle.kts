@@ -62,6 +62,9 @@ dependencies {
     implementation("io.jsonwebtoken:jjwt:0.9.1")
     implementation("javax.xml.bind:jaxb-api:2.3.1")
 
+    implementation("org.apache.poi:poi:3.9")
+    implementation("org.apache.poi:poi-ooxml:3.9")
+
     developmentOnly("org.springframework.boot:spring-boot-devtools")
     runtimeOnly("com.h2database:h2")
 
